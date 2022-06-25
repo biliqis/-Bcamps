@@ -1,19 +1,18 @@
 const mongoose = require("mongoose");
-
+const geocoder = require("../utils/geocoder");
 const BootcampSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "please add a name"],
   },
 
-  slung: String, 
+  slung: String,
 
-    description: {
-      type: String,
-      required: [true, "please add a description"],
-      maxlength: [500, "Description cannot be more than 500"],
-    },
-  
+  description: {
+    type: String,
+    required: [true, "please add a description"],
+    maxlength: [500, "Description cannot be more than 500"],
+  },
 
   website: {
     type: String,
@@ -42,8 +41,18 @@ const BootcampSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ["Point"],
-      required: true,
     },
+
+    cordinates: {
+      type: [Number],
+      index: "2dsphere",
+    },
+
+    formattedAddress: String,
+    street: String,
+    state: String,
+    zipCode: String,
+    country: String,
   },
   career: {
     type: [String],
@@ -91,6 +100,23 @@ const BootcampSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+BootcampSchema.pre('save', async function(next) {
+  const loc = await geocoder(this.address)
+   this.location={
+    type: 'Point',
+    cordinates:[loc[0].longitude, loc[0].latitude],
+    formattedAddress: loc[0].formattedAddress,
+    street: loc[0].stretName,
+    city: loc[0].city,
+    zipCode: loc[0].zipCode,
+    streeNumber: loc[0].streeNumber
+
+  }
+
+  this.address=undefined
+next();
 });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);

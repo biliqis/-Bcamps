@@ -1,14 +1,19 @@
 const express = require("express");
 const {
   getBootcamp,
-  createBootcamp,
-  updateBootcamp,
+  getSingleBootcamp,
   deleteBootcamp,
-} = require("./controller/controller");
+  updateBootcamp,
+  createBootcamp,
+} = require("../controller/controller");
 
 const router = express.Router();
 
-router.route("/").get(getBootcamp).post(createBootcamp);
+router
+.route('/')
+.get(getBootcamp)
+.post(createBootcamp);
+
 router
   .route("/:id")
   .get(getBootcamp)
@@ -16,4 +21,3 @@ router
   .delete(deleteBootcamp);
 
 module.exports = router;
- 
